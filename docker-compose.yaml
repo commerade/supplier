@@ -1,0 +1,10 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    container_name: supplier
+    environment:
+      CMD_PARAM: "http"
+    ports:
+      - "1323:1323"

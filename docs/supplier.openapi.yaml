@@ -1,0 +1,316 @@
+openapi: 3.0.0
+info:
+  title: supplier
+  description: ''
+  version: 1.0.0
+tags:
+  - name: supplier
+paths:
+  /suppliers/{id}:
+    get:
+      summary: Find supplier by id
+      description: The read operation allows you to retrieve information about an existing supplier
+      tags:
+        - supplier
+      parameters:
+        - name: id
+          in: path
+          description: supplier id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindSupplier'
+        '404':
+          description: Record Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSupplier'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSupplier'
+    delete:
+      summary: Delete supplier by id
+      description: The delete operation allows you to remove an existing supplier from your system
+      tags:
+        - supplier
+      parameters:
+        - name: id
+          in: path
+          description: supplier id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+          content:
+            application/json:
+              schema:
+                type: object
+        '404':
+          description: Record Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSupplier'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSupplier'
+    put:
+      summary: Update supplier by id
+      description: The update operation allows you to modify an existing supplier's information
+      tags:
+        - supplier
+      parameters:
+        - name: id
+          in: path
+          description: supplier id
+          required: true
+          schema:
+            type: string
+        - name: Account-Id
+          in: header
+          description: Account Id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Supplier'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SaveSupplier'
+        '404':
+          description: Record Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSupplier'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSupplier'
+  /suppliers:
+    get:
+      summary: Find suppliers
+      description: The read operation allows you to retrieve information about the suppliers
+      tags:
+        - supplier
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FindSupplier'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSupplier'
+    post:
+      summary: Create supplier
+      deprecated: false
+      description: The create operation allows you to add a new supplier to your system
+      tags:
+        - supplier
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SaveSupplier'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSupplier'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorSupplier'
+components:
+  schemas:
+    FindSupplier:
+      allOf:
+        - $ref: '#/components/schemas/Supplier'
+      type: object
+      properties:
+        id:
+          type: string
+          description: supplier id
+          format: uuid
+      required:
+        - id
+    SaveSupplier:
+      allOf:
+        - $ref: '#/components/schemas/Supplier'
+      type: object
+      properties:
+        email:
+          type: string
+          description: supplier email
+          minLength: 13
+          maxLength: 14
+          format: email
+        phone:
+          type: string
+          description: supplier phone
+      required:
+        - email
+        - phone
+    ErrorSupplier:
+      type: object
+      properties:
+        error:
+          type: string
+          description: type error
+        error-description:
+          type: string
+          description: error description
+      required:
+        - error
+        - error-description
+    Supplier:
+      type: object
+      properties:
+        image-url:
+          type: string
+          description: supplier image url
+          format: uri
+          title: image url
+        name:
+          type: string
+          description: supplier name
+          title: supplier name
+        address:
+          type: object
+          properties:
+            street:
+              type: string
+              description: street supplier address
+              title: street supplier address
+            number:
+              type: string
+              description: number supplier address
+              title: number supplier address
+            city:
+              type: string
+              description: city supplier address
+              title: city supplier address
+            zip-code:
+              type: string
+              description: zip code supplier address
+              title: zip code supplier address
+            country:
+              type: string
+            additional-info:
+              type: string
+              description: additional info
+              title: additional info
+          description: supplier address
+          title: supplier address
+          required:
+            - street
+            - city
+            - zip-code
+            - number
+            - additional-info
+            - country
+        delivery-days:
+          type: array
+          items:
+            type: string
+            description: days of week
+            enum:
+              - MONDAY
+              - TUESDAY
+              - WEDNESDAY
+              - THURSDAY
+              - FRIDAY
+              - SATURDAY
+              - SUNDAY
+            title: days of week
+          description: delivery days
+          title: delivery days
+        min-hours-order:
+          type: integer
+          description: minimum hours to order
+          title: minimum hours to order
+          minimum: 3
+        min-order-amount:
+          type: object
+          properties:
+            amount:
+              type: number
+              minimum: 1
+              description: amount order
+            unit-measurement:
+              type: string
+              enum:
+                - BRL
+              description: unit of measurement
+          description: minimum order amount
+        max-delivery-distance:
+          type: object
+          properties:
+            value:
+              type: number
+              description: value distance
+              title: value distance
+              minimum: 0
+            unit-measurement:
+              type: string
+              description: unit of measurement
+              enum:
+                - KM
+              title: unit of measurement
+          description: maximum delivery distance
+          required:
+            - value
+            - unit-measurement
+          title: maximum delivery distance
+      required:
+        - name
+        - address
+        - max-delivery-distance
+        - min-hours-order
+        - delivery-days
+        - image-url
+        - min-order-amount
+servers:
+  - url: http://localhost:1323
+    description: Testing Env
