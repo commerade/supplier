@@ -6,11 +6,13 @@ package cmd
 
 import (
 	"os"
+	"supplier/config"
 
 	"github.com/spf13/cobra"
 )
 
-
+var metricProvider string
+var traceProvider string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -37,15 +39,23 @@ func Execute() {
 }
 
 func init() {
+	cobra.OnInitialize(initConfig)
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
 	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.supplier.yaml)")
 
+	rootCmd.Flags().StringVarP(&metricProvider, "metricProvider", "", "prometheus", "Defines which metric provider should be used")
+	rootCmd.Flags().StringVarP(&traceProvider, "traceProvider", "", "jaeger", "Defines which trace provider should be used")
+
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
-
+func initConfig() {
+	config.LoadEnvironmentVariables()
+	config.InitMetric(metricProvider)
+	config.InitTrace(traceProvider)
+}
